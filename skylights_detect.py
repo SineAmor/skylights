@@ -16,3 +16,5 @@ def object_detection_image():
     st.title('Object Detection for Images')
     st.subheader('''This object detection project takes in an image and''' \
                  ''''outputs the image with bounding boxes created around the objects in the image''')
+    
+object_detection_image()
