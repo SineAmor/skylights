@@ -32,6 +32,7 @@ def object_detection_image():
                                    'config_and_weights', 'yolov4-custom.cfg')
         weights_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                     'config_and_weights', 'yolov4-custom_best.weights')
-    st.write(config_path)
+        with open(weights_path, "rb") as response:
+            st.write(response.readline())
     
 object_detection_image()
