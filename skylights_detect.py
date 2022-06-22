@@ -32,7 +32,8 @@ def object_detection_image():
                                    'config_and_weights', 'yolov4-custom.cfg')
         weights_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                     'config_and_weights', 'yolov4-custom_best.weights')
-        with open(weights_path, "rb") as response:
-            st.write(response.readline())
+        net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     
 object_detection_image()
