@@ -28,7 +28,7 @@ def object_detection_image():
         whT = 320
         class_names = ['skylight']
         config_path = os.listdir('config_and_weights/yolov4.cfg')
-        weights_path = os.listdir('config_and_weights/yolov4.weights')
+        weights_path = os.listdir('config_and_weights/yolov4-custom_best.weights')
         weights = open(weights_path, 'rb')
         st.write(weights.read())
     
