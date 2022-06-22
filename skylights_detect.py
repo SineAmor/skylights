@@ -28,8 +28,10 @@ def object_detection_image():
         nms_threshold = st.slider('Threshold', 0, 100, 20)
         whT = 320
         class_names = ['skylight']
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config_and_weights', 'yolov4-custom.cfg')
-        weights_path = os.listdir(os.path.dirname(os.path.abspath(__file__)), 'config_and_weights', 'yolov4-custom_best.weights')
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                   'config_and_weights', 'yolov4-custom.cfg')
+        weights_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    'config_and_weights', 'yolov4-custom_best.weights')
     st.write(config_path)
     
 object_detection_image()
