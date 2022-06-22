@@ -22,5 +22,14 @@ def object_detection_image():
         img2 = np.array(img1)
         
         st.image(img1, caption = 'Uploaded Image')
+        my_bar = st.progress(0)
+        conf_threshold = st.slider('Confidence', 0, 100, 50)
+        nms_threshold = st.slider('Threshold', 0, 100, 20)
+        whT = 320
+        class_names = ['skylight']
+        config_path = os.listdir('config_and_weights/yolov4.cfg')
+        weights_path = os.listdir('config_and_weights/yolov4.weights')
+        weights = open(weights_path, 'rb')
+        st.write(weights.read())
     
 object_detection_image()
