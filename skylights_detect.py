@@ -28,7 +28,7 @@ def object_detection_image():
     #    nms_threshold = st.slider('Threshold', 0, 100, 20)
     #    whT = 320
     #    class_names = ['skylight']
-    config_path = os.join(os.path.dirname(os.path.abspath(__file__)), 'config_and_weights')
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config_and_weights')
         #weights_path = os.listdir('config_and_weights/yolov4-custom_best.weights')
         #weights = open(weights_path, 'rb')
     st.write(config_path)
