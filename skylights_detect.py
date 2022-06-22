@@ -31,6 +31,6 @@ def object_detection_image():
         config_path = os.path.dirname(__file__)
         #weights_path = os.listdir('config_and_weights/yolov4-custom_best.weights')
         #weights = open(weights_path, 'rb')
-        st.write(config_path.read())
+        st.write(config_path)
     
 object_detection_image()
