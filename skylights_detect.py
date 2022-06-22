@@ -11,6 +11,7 @@ import cv2
 from PIL import Image, ImageEnhance
 import numpy as np
 import os
+import urllib
 
 def object_detection_image():
     st.title('Object Detection for Images')
@@ -27,9 +28,9 @@ def object_detection_image():
         nms_threshold = st.slider('Threshold', 0, 100, 20)
         whT = 320
         class_names = ['skylight']
-        config_path = os.listdir('config_and_weights/yolov4.cfg')
-        weights_path = os.listdir('config_and_weights/yolov4-custom_best.weights')
-        weights = open(weights_path, 'rb')
-        st.write(weights.read())
+        config_path = os.path.dirname(__file__)
+        #weights_path = os.listdir('config_and_weights/yolov4-custom_best.weights')
+        #weights = open(weights_path, 'rb')
+        st.write(config_path.read())
     
 object_detection_image()
