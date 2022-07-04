@@ -85,7 +85,10 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
         results = {}
         for i in indices:
             i = i
-            results[class_names[class_ids[i]]] = results[class_names[class_ids[i]]].get(class_names[class_ids[i]], 0) + 1
+            if class_names[class_ids[i]] not in results:
+                results[class_names[class_ids[i]]] = 1
+            else:
+                results[class_names[class_ids[i]]] += 1
             box = bbox[i]
             x, y, w, h = box[0], box[1], box[2], box[3]
             cv2.rectangle(img_arr, (x,y), (x+w, y+h), (240, 54, 230), 2)
