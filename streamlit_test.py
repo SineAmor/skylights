@@ -68,7 +68,7 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     
     def find_objects(outputs):
-        hT, wT, cT = img_arr.shape()
+        hT, wT, cT = img_arr.shape
         bbox, class_ids, confidences = [], [], []
         for output in outputs:
             for detection in output:
