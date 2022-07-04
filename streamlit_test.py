@@ -47,36 +47,8 @@ def object_detector_ui():
     overlap_thresh = st.sidebar.slider('Overlap Threshold', 0, 100, 30)
     return confidence_thresh, overlap_thresh
 
-def yolo_v3(image, user_confidence, user_overlap):
-    @st.cache(allow_output_mutation = True)
-    def load_network(config_path, weights_path):
-        net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
-        output_layer_names = net.getLayerNames()
-        output_layer_names = [output_layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
-        return net, output_layer_names
-    net, output_layer_names = load_network("yolov3.cfg", "yolov3.weights")
-    
-    blob = cv2.dnn.blobFromImage(image, 1/255, (416, 416), [0,0,0], 1, crop = False)
-    net.setInput(blob)
-    layer_outputs = net.forward(output_layer_names)
-    
-    boxes, confidences, class_IDs = [], [], []
-    H, W = image.shape[:2]
-    for output in layer_outputs:
-        for detection in output:
-            scores = detection[5:]
-            classID = np.argmax(scores)
-            confidence = scores[classID]
-            if confidence >= (user_confidence/100):
-                box = detection[0:4] * np.array([W, H, W, H])
-                centerX, centerY, width, height = box.astype('int')
-                x, y = int(centerX - (width/2)), int(centerY - (height/2))
-                boxes.append([x, y, int(width), int(height)])
-                confidences.append(float(confidence))
-                class_IDs.append(classID)
-    indices = cv2.dnn.NMSBoxes(boxes, confidences, user_confidence, user_overlap)
-    xmin, xmax, ymin, ymax, labels = [], [], [], [], []
-    udacity_labels = {
+def yolo_v3(img_arr, user_confidence, user_overlap):
+    class_names = {
         0: 'pedestrian',
         1: 'biker',
         2: 'car',
@@ -84,38 +56,52 @@ def yolo_v3(image, user_confidence, user_overlap):
         5: 'truck',
         7: 'truck',
         9: 'trafficLight'}
-    if len(indices) > 0:
-        for i in indices.flatten():
-            label = udacity_labels.get(class_IDs[i], None)
-            if label is None:
-                continue
-            x, y, w, h = boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][3]
-            
-            xmin.append(x)
-            ymin.append(y)
-            xmax.append(x+w)
-            ymax.append(y+h)
-            labels.append(label)
-            
-    boxes = pd.DataFrame({'xmin':xmin, 'ymin':ymin, 'xmax':xmax, 'ymax':ymax, 'labels':labels})
-    return boxes[['xmin', 'ymin', 'xmax', 'ymax', 'labels']]
-
-def draw_image_w_boxes(image, boxes, header, description):
-    label_colors = {
-        "car": [255, 0, 0],
-        "pedestrian": [0, 255, 0],
-        "truck": [0, 0, 255],
-        "trafficLight": [255, 255, 0],
-        "biker": [255, 0, 255]}
-    image_with_boxes = image.astype(np.float64)
-    for _, (xmin, ymin, xmax, ymax, label) in boxes.iterrows():
-        image_with_boxes[int(ymin):int(ymax),int(xmin):int(xmax),:] += label_colors[label]
-        image_with_boxes[int(ymin):int(ymax),int(xmin):int(xmax),:] /= 2
+    my_bar = st.progress(0)
+    @st.cache(allow_output_mutation = True)
+    def load_network(config_path, weights_path):
+        net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
+        output_layer_names = net.getLayerNames()
+        output_layer_names = [output_layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
+        return net, output_layer_names
+    net, output_layer_names = load_network("yolov3.cfg", "yolov3.weights")
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     
-    st.subheader(header)
-    st.markdown(description)
-    st.image(image_with_boxes.astype(np.uint8), use_column_width = True, caption = 'Processed Image')
-        
+    def find_objects(outputs):
+        hT, wT, cT = img_arr.shape()
+        bbox, class_ids, confidences = [], [], []
+        for output in outputs:
+            for detection in output:
+                scores = detection[5:]
+                class_ID = np.argmax(scores)
+                confidence = scores[class_ID]
+                if confidence >= (user_confidence/100):
+                    w,h = int(detection[2]*wT), int(detection[3]*hT)
+                    x,y = int((detection[0]*wT) - w/2), int((detection[1]*hT) - h/2)
+                    bbox.append([x,y,w,h])
+                    class_ids.append(class_ID)
+                    confidences.append(float(confidence))
+        indices = cv2.dnn.NMSBoxes(bbox, confidences, user_confidence/100, user_overlap/100)
+        for i in indices:
+            i = i
+            box = bbox[i]
+            x, y, w, h = box[0], box[1], box[2], box[3]
+            cv2.rectangle(img_arr, (x,y), (x+w, y+h), (240, 54, 230), 2)
+            cv2.putText(img_arr, f'{class_names[class_ids[i]]} {int(confidences[i]*100)}%', (x, y-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (240, 0, 240), 2)
+            
+    blob = cv2.dnn.blobFromImage(img_arr, 1/255, (416, 416), [0,0,0], 1, crop = False)
+    net.setInput(blob)
+    layers_names = net.getLayerNames()
+    output_names = [layers_names[i-1] for i in net.getUnconnectedOutLayers()]
+    outputs = net.forward(output_names)
+    find_objects(outputs)
+    
+    st.image(img_arr, caption = 'Processed Image')
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    my_bar.progress(100)
+    
 def main():
     for filename in ext_dependencies.keys():
         download_file(filename)
@@ -126,9 +112,11 @@ def main():
     file = st.file_uploader('Upload Image', type = ['jpg', 'png', 'jpeg'])
     if file != None:
         img1 = Image.open(file)
+        img2 = np.array(img1)
+        
         st.image(img1, caption = 'Uploaded Image')
+        
         yolo_boxes = yolo_v3(img1, confidence_thresh, overlap_thresh)
-        draw_image_w_boxes(img1, yolo_boxes, 'Real-time Computer Vision')
         
 if __name__ == "__main__":
     main()
