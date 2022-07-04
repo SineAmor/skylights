@@ -42,6 +42,7 @@ def download_file(file_path):
             progress_bar.empty()
 
 def object_detector_ui():
+    st.sidebar.markdown('# Model')
     confidence_thresh = st.slider('Confidence Threshold', 0, 100, 50)
     overlap_thresh = st.slider('Overlap Threshold', 0, 100, 30)
     return confidence_thresh, overlap_thresh
@@ -58,7 +59,7 @@ def yolo_v3(confidence, overlap):
 def main():
     for filename in ext_dependencies.keys():
         download_file(filename)
-    object_detector_ui()
+    confidence_thresh, overlap_thresh = object_detector_ui()
     st.title('Object Detection for Images')
     st.subheader('''This object detection project takes in an image and''' \
                  ''''outputs the image with bounding boxes created around the objects in the image''')
