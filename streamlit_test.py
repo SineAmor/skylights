@@ -58,6 +58,7 @@ def yolo_v3(confidence, overlap):
 def main():
     for filename in ext_dependencies.keys():
         download_file(filename)
+    object_detector_ui()
     st.title('Object Detection for Images')
     st.subheader('''This object detection project takes in an image and''' \
                  ''''outputs the image with bounding boxes created around the objects in the image''')
@@ -65,7 +66,6 @@ def main():
     if file != None:
         img1 = Image.open(file)
         img2 = np.array(img1)
-        
         st.image(img1, caption = 'Uploaded Image')
         
 if __name__ == "__main__":
