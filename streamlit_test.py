@@ -89,9 +89,10 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
             cv2.rectangle(img_arr, (x,y), (x+w, y+h), (240, 54, 230), 2)
             cv2.putText(img_arr, f'{class_names[class_ids[i]]} {int(confidences[i]*100)}%', (x, y-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 0, 240), 2)
-        results = list(zip(*np.unique(class_ids, return_counts = True)))
-        for item in results:
-            st.write(f'{class_names[class_ids[item[0]]]} : {item[1]} count')
+        st.write(class_ids)
+        #results = list(zip(*np.unique(class_ids, return_counts = True)))
+        #for item in results:
+        #    st.write(f'{class_names[class_ids[item[0]]]} : {item[1]} count')
     blob = cv2.dnn.blobFromImage(img_arr, 1/255, (416, 416), [0,0,0], 1, crop = False)
     net.setInput(blob)
     layers_names = net.getLayerNames()
