@@ -72,6 +72,7 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
         bbox, class_ids, confidences = [], [], []
         for output in outputs:
             for detection in output:
+                st.write(detection)
                 scores = detection[5:]
                 class_ID = np.argmax(scores)
                 confidence = scores[class_ID]
