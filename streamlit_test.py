@@ -47,7 +47,7 @@ def object_detector_ui():
     overlap_thresh = st.sidebar.slider('Overlap Threshold', 0, 100, 30)
     return confidence_thresh, overlap_thresh
 
-def yolo_v3(confidence, overlap):
+def yolo_v3(image, user_confidence, user_overlap):
     @st.cache(allow_output_mutation = True)
     def load_network(config_path, weights_path):
         net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
@@ -56,6 +56,66 @@ def yolo_v3(confidence, overlap):
         return net, output_layer_names
     net, output_layer_names = load_network("yolov3.cfg", "yolov3.weights")
     
+    blob = cv2.dnn.blobFromImage(image, 1/255, (416, 416), [0,0,0], 1, crop = False)
+    net.setInput(blob)
+    layer_outputs = net.forward(output_layer_names)
+    
+    boxes, confidences, class_IDs = [], [], []
+    H, W = image.shape[:2]
+    for output in layer_outputs:
+        for detection in output:
+            scores = detection[5:]
+            classID = np.argmax(scores)
+            confidence = scores[classID]
+            if confidence >= (user_confidence/100):
+                box = detection[0:4] * np.array([W, H, W, H])
+                centerX, centerY, width, height = box.astype('int')
+                x, y = int(centerX - (width/2)), int(centerY - (height/2))
+                boxes.append([x, y, int(width), int(height)])
+                confidences.append(float(confidence))
+                class_IDs.append(classID)
+    indices = cv2.dnn.NMSBoxes(boxes, confidences, user_confidence, user_overlap)
+    xmin, xmax, ymin, ymax, labels = [], [], [], [], []
+    udacity_labels = {
+        0: 'pedestrian',
+        1: 'biker',
+        2: 'car',
+        3: 'biker',
+        5: 'truck',
+        7: 'truck',
+        9: 'trafficLight'}
+    if len(indices) > 0:
+        for i in indices.flatten():
+            label = udacity_labels.get(class_IDs[i], None)
+            if label is None:
+                continue
+            x, y, w, h = boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][3]
+            
+            xmin.append(x)
+            ymin.append(y)
+            xmax.append(x+w)
+            ymax.append(y+h)
+            labels.append(label)
+            
+    boxes = pd.DataFrame({'xmin':xmin, 'ymin':ymin, 'xmax':xmax, 'ymax':ymax, 'labels':labels})
+    return boxes[['xmin', 'ymin', 'xmax', 'ymax', 'labels']]
+
+def draw_image_w_boxes(image, boxes, header, description):
+    label_colors = {
+        "car": [255, 0, 0],
+        "pedestrian": [0, 255, 0],
+        "truck": [0, 0, 255],
+        "trafficLight": [255, 255, 0],
+        "biker": [255, 0, 255]}
+    image_with_boxes = image.astype(np.float64)
+    for _, (xmin, ymin, xmax, ymax, label) in boxes.iterrows():
+        image_with_boxes[int(ymin):int(ymax),int(xmin):int(xmax),:] += label_colors[label]
+        image_with_boxes[int(ymin):int(ymax),int(xmin):int(xmax),:] /= 2
+    
+    st.subheader(header)
+    st.markdown(description)
+    st.image(image_with_boxes.astype(np.uint8), use_column_width = True, caption = 'Processed Image')
+        
 def main():
     for filename in ext_dependencies.keys():
         download_file(filename)
@@ -63,12 +123,12 @@ def main():
     st.title('Object Detection for Images')
     st.subheader('''This object detection project takes in an image and''' \
                  ''''outputs the image with bounding boxes created around the objects in the image''')
-    yolo_v3(confidence_thresh, overlap_thresh)
     file = st.file_uploader('Upload Image', type = ['jpg', 'png', 'jpeg'])
     if file != None:
         img1 = Image.open(file)
-        img2 = np.array(img1)
         st.image(img1, caption = 'Uploaded Image')
+        yolo_boxes = yolo_v3(img1, confidence_thresh, overlap_thresh)
+        draw_image_w_boxes(img1, yolo_boxes, 'Real-time Computer Vision')
         
 if __name__ == "__main__":
     main()
