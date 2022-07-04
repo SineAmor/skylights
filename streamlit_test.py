@@ -116,7 +116,7 @@ def main():
         
         st.image(img1, caption = 'Uploaded Image')
         
-        yolo_boxes = yolo_v3(img1, confidence_thresh, overlap_thresh)
+        yolo_v3(img2, confidence_thresh, overlap_thresh)
         
 if __name__ == "__main__":
     main()
