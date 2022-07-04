@@ -84,12 +84,12 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
         indices = cv2.dnn.NMSBoxes(bbox, confidences, user_confidence/100, user_overlap/100)
         for i in indices:
             i = i
+            st.write(i)
             box = bbox[i]
             x, y, w, h = box[0], box[1], box[2], box[3]
             cv2.rectangle(img_arr, (x,y), (x+w, y+h), (240, 54, 230), 2)
             cv2.putText(img_arr, f'{class_names[class_ids[i]]} {int(confidences[i]*100)}%', (x, y-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 0, 240), 2)
-        st.write(class_ids)
         #results = list(zip(*np.unique(class_ids, return_counts = True)))
         #for item in results:
         #    st.write(f'{class_names[class_ids[item[0]]]} : {item[1]} count')
