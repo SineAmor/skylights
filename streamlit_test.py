@@ -40,8 +40,10 @@ def download_file(file_path):
         if progress_bar is not None:
             progress_bar.empty()
 
-confidence_thresh = st.slider('Confidence Threshold', 0, 100, 50)
-overlap_thresh = st.slider('Overlap Threshold', 0, 100, 30)
+def object_detector_ui():
+    confidence_thresh = st.slider('Confidence Threshold', 0, 100, 50)
+    overlap_thresh = st.slider('Overlap Threshold', 0, 100, 30)
+    return confidence_thresh, overlap_thresh
 
 def yolo_v3(confidence, overlap):
     @st.cache(allow_output_mutation = True)
