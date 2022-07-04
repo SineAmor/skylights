@@ -54,7 +54,7 @@ def yolo_v3(confidence, overlap):
         output_layer_names = net.getLayerNames()
         output_layer_names = [output_layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
         return net, output_layer_names
-    net, output_layer_names = load_network("yolov3.cfg", "yolov3.weights")
+    net, output_layer_names = load_network("yolov3.cfg", "yolov4.weights")
     
 def main():
     for filename in ext_dependencies.keys():
