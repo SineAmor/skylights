@@ -98,7 +98,7 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
     find_objects(outputs)
     
     st.image(img_arr, caption = 'Processed Image')
-    cv2.waitKey(0)
+    #cv2.waitKey(0)
     cv2.destroyAllWindows()
     my_bar.progress(100)
     
