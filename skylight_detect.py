@@ -5,10 +5,10 @@ from PIL import Image, ImageEnhance
 import os, urllib, cv2
 
 ext_dependencies = {
-    'yolov3.weights': {'url': 'https://pjreddie.com/media/files/yolov3.weights',
-                       'size': 248007048},
-    'yolov3.cfg': {'url': 'https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg',
-                   'size': 8342}
+    'yolov4.weights': {'url': 'https://github.com/SineAmor/skylights/raw/main/config_and_weights/yolov4-custom_best.weights',
+                       'size': 256093676},
+    'yolov4.cfg': {'url': 'https://raw.githubusercontent.com/SineAmor/skylights/main/config_and_weights/yolov4-custom.cfg',
+                   'size': 12246}
 }
 
 def download_file(file_path):
@@ -48,14 +48,7 @@ def object_detector_ui():
     return confidence_thresh, overlap_thresh
 
 def yolo_v3(img_arr, user_confidence, user_overlap):
-    class_names = {
-        0: 'pedestrian',
-        1: 'biker',
-        2: 'car',
-        3: 'biker',
-        5: 'truck',
-        7: 'truck',
-        9: 'trafficLight'}
+    class_names = {0: 'skylights'}
     my_bar = st.progress(0)
     @st.cache(allow_output_mutation = True)
     def load_network(config_path, weights_path):
@@ -63,7 +56,7 @@ def yolo_v3(img_arr, user_confidence, user_overlap):
         output_layer_names = net.getLayerNames()
         output_layer_names = [output_layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
         return net, output_layer_names
-    net, output_layer_names = load_network("yolov3.cfg", "yolov3.weights")
+    net, output_layer_names = load_network("yolov4.cfg", "yolov4.weights")
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     
