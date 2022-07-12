@@ -5,8 +5,8 @@ from PIL import Image, ImageEnhance
 import os, urllib, cv2
 
 ext_dependencies = {
-    'yolov4.weights': {'url': 'https://github.com/SineAmor/skylights/raw/main/config_and_weights/yolov4-custom_best.weights',
-                       'size': 256093676},
+    'yolov4.weights': {'url': 'https://docs.google.com/uc?export=download&id=16yYwjZy6dnFBCMEXTWejMd4lP3SjMmXw&confirm=1',
+                       'size': 255950444},
     'yolov4.cfg': {'url': 'https://raw.githubusercontent.com/SineAmor/skylights/main/config_and_weights/yolov4-custom.cfg',
                    'size': 12246}
 }
