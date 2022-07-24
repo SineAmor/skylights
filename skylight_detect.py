@@ -43,7 +43,7 @@ def download_file(file_path):
 
 def object_detector_ui():
     st.sidebar.markdown('# Model Settings')
-    confidence_thresh = st.sidebar.slider('Confidence Threshold', 0, 100, 50)
+    confidence_thresh = st.sidebar.slider('Confidence Threshold', 0, 100, 40)
     overlap_thresh = st.sidebar.slider('Overlap Threshold', 0, 100, 30)
     return confidence_thresh, overlap_thresh
 
